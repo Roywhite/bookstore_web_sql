@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookAdminModelMapper">
+  <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookAdminModel">
+    <result column="ADMIN_ACCOUNT" jdbcType="NUMERIC" property="adminAccount" />
+    <result column="ADMIN_PASSWORD" jdbcType="VARCHAR" property="adminPassword" />
+  </resultMap>
+  <select id="booleanUserAndPass" resultType="java.lang.Integer">
+    SELECT COUNT(BA.ADMIN_ACCOUNT)
+    FROM BOOK_ADMIN BA
+    <where>
+      BA.ADMIN_ACCOUNT =  #{adminAccount,jdbcType=DECIMAL}
+      AND BA.ADMIN_PASSWORD = #{adminPassword,jdbcType=VARCHAR}
+    </where>
+  </select>
+
+</mapper>

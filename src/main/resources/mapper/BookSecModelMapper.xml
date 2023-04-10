@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookSecModelMapper">
+  <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookSecModel">
+    <id column="ID" jdbcType="NUMERIC" property="id" />
+    <result column="SEC_NUM" jdbcType="NUMERIC" property="secNum" />
+  </resultMap>
+  <select id="getSec" resultType="java.lang.String">
+    SELECT BS.SEC_NUM FROM BOOK_SEC BS
+  </select>
+
+</mapper>

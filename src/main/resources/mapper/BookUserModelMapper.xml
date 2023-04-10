@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookUserModelMapper">
+  <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookUserModel">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="ACCOUNT" jdbcType="DECIMAL" property="account" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="BACKKEY" jdbcType="DECIMAL" property="backKey" />
+    <result column="SCORE" jdbcType="DECIMAL" property="score" />
+    <result column="RECEIVER_ADDRESS" jdbcType="VARCHAR" property="receiverAddress" />
+    <result column="BOOLEAN_RENT" jdbcType="DECIMAL" property="booleanRent" />
+    <result column="CURRENT_ORDER_NUM" jdbcType="DECIMAL" property="currentOrderNum" />
+    <result column="RESIDUE_DEGREE" jdbcType="DECIMAL" property="residueDegree" />
+  </resultMap>
+
+  <select id="booleanUserAndPass" resultType="java.lang.Integer" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT COUNT(BUP.ACCOUNT)
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.PASSWORD = #{password,jdbcType=VARCHAR}
+    </where>
+  </select>
+
+  <select id="booleanSameUser" resultType="java.lang.Integer" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT COUNT(BUP.ACCOUNT)
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+    </where>
+  </select>
+
+  <insert id="insertUser" parameterType="com.xiaobai.entity.BookUserModel">
+    <selectKey resultType="int" keyProperty="id" order="BEFORE">
+      SELECT BOOK_USER_PASS_SEQUENCE.nextval FROM DUAL
+  </selectKey>
+    insert into BOOK_USER_PASS(
+    id,name,account,password,backkey,score,RECEIVER_ADDRESS,boolean_rent,current_order_num,residue_degree
+    ) values (
+    #{id},#{name,jdbcType=VARCHAR},#{account,jdbcType=DECIMAL},#{password,jdbcType=VARCHAR},#{backKey,jdbcType=DECIMAL},0,'',0,'',1
+    )
+  </insert>
+
+  <select id="booleanUserAndBackKey" resultType="java.lang.Integer" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT COUNT(BUP.ACCOUNT)
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.BACKKEY = #{backKey,jdbcType=DECIMAL}
+    </where>
+  </select>
+  <select id="getPasswordByAccountAndKey" resultType="java.lang.String" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT BUP.PASSWORD
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.BACKKEY = #{backKey,jdbcType=DECIMAL}
+    </where>
+  </select>
+  <select id="getScore" resultType="java.lang.Integer" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT BUP.SCORE
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.PASSWORD = #{password,jdbcType=VARCHAR}
+    </where>
+  </select>
+  <select id="getBooleanRent" resultType="java.lang.Integer" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT BUP.BOOLEAN_RENT
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.PASSWORD = #{password,jdbcType=VARCHAR}
+    </where>
+  </select>
+  <select id="getCurrentOrderNum" resultType="java.lang.Long" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT BUP.CURRENT_ORDER_NUM
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+    </where>
+  </select>
+  <select id="getResidueDegree" resultType="java.lang.Integer" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT BUP.RESIDUE_DEGREE
+    FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.PASSWORD = #{password,jdbcType=VARCHAR}
+    </where>
+  </select>
+  <select id="getName" resultType="java.lang.String" parameterType="com.xiaobai.entity.BookUserModel">
+    SELECT BUP.NAME FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+    </where>
+  </select>
+  <select id="getReceiverAddress" resultType="java.lang.String">
+    SELECT BUP.RECEIVER_ADDRESS FROM BOOK_USER_PASS BUP
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+    </where>
+  </select>
+
+  <update id="updateResidueDegree">
+    UPDATE BOOK_USER_PASS BUP SET BUP.RESIDUE_DEGREE = #{num,jdbcType=DECIMAL}
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+    </where>
+  </update>
+  <update id="updatePersonName">
+    UPDATE BOOK_USER_PASS BUP SET BUP.NAME = #{newName,jdbcType=VARCHAR}
+    <where>
+      BUP.ACCOUNT = #{userAccount,jdbcType=DECIMAL}
+    </where>
+  </update>
+  <update id="updatePersonPasswd">
+    UPDATE BOOK_USER_PASS BUP SET BUP.PASSWORD = #{newPasswd,jdbcType=VARCHAR}
+    <where>
+      BUP.ACCOUNT = #{userAccount,jdbcType=DECIMAL}
+    </where>
+  </update>
+  <update id="updateUserScore" parameterType="com.xiaobai.entity.BookUserModel">
+    UPDATE BOOK_USER_PASS BUP SET BUP.SCORE = #{score,jdbcType=DECIMAL}
+    <where>
+      BUP.ACCOUNT =  #{account,jdbcType=DECIMAL}
+      AND BUP.PASSWORD = #{password,jdbcType=VARCHAR}
+    </where>
+  </update>
+  <update id="updateReceiverAddress" parameterType="com.xiaobai.entity.BookUserModel">
+    UPDATE BOOK_USER_PASS BUP SET BUP.RECEIVER_ADDRESS = #{receiverAddress,jdbcType=VARCHAR}
+    <where>
+      BUP.ACCOUNT = #{account,jdbcType=DECIMAL}
+    </where>
+  </update>
+  <update id="updateBoolRentAndOrderNumAndResDegree">
+    UPDATE BOOK_USER_PASS BUP SET BUP.BOOLEAN_RENT = #{booleanRent,jdbcType=DECIMAL}, BUP.CURRENT_ORDER_NUM = #{orderNum,jdbcType=DECIMAL},BUP.RESIDUE_DEGREE = #{resDegree,jdbcType=DECIMAL}
+    <where>
+      BUP.ACCOUNT = #{userAccount,jdbcType=DECIMAL}
+    </where>
+  </update>
+
+</mapper>

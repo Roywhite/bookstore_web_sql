@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookBooksModelMapper">
+    <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookBooksModel">
+        <id column="ID" jdbcType="NUMERIC" property="id"/>
+        <result column="LOCATION_NAME" jdbcType="VARCHAR" property="locationName"/>
+        <result column="BOOKS_CODING" jdbcType="NUMERIC" property="booksCoding"/>
+        <result column="BOOKS_NAME" jdbcType="VARCHAR" property="booksName"/>
+        <result column="BOOKS_LOCATION" jdbcType="VARCHAR" property="booksLocation"/>
+        <result column="BOOKS_NUM" jdbcType="NUMERIC" property="booksNum"/>
+        <result column="BOOKS_PROFILE" jdbcType="VARCHAR" property="booksProfile"/>
+        <result column="BOOKS_RENT_NUM" jdbcType="NUMERIC" property="booksRentNum"/>
+        <result column="BOOKS_SCORE" jdbcType="DOUBLE" property="booksScore"/>
+    </resultMap>
+
+    <insert id="createBookRankingList" useGeneratedKeys="false">
+        INSERT INTO BOOK_RANKING_LIST ( book_name, book_score ) (
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        BB.books_name,
+        AVG( BB.books_score )
+        FROM
+        BOOK_BOOKS BB
+        GROUP BY
+        ( BB.books_name )
+        ORDER BY
+        AVG( BB.books_score ) DESC
+        )
+        <where>
+            ROWNUM &lt;= 10
+        </where>
+        )
+    </insert>
+    <update id="updateBooksNum">
+        UPDATE BOOK_BOOKS BB SET BB.BOOKS_NUM = #{bookNowNum}
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </update>
+    <update id="updateBookStoreBookNumByRetrun">
+        UPDATE BOOK_BOOKS BB SET BB.BOOKS_NUM = #{bookNum}
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </update>
+    <update id="updateBookScoreAndRentNum">
+        UPDATE BOOK_BOOKS BB SET BB.BOOKS_RENT_NUM = #{rentNum},BB.BOOKS_SCORE = #{bookScore}
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </update>
+
+    <delete id="clearBookRankingList">
+    delete from BOOK_RANKING_LIST
+  </delete>
+
+    <delete id="clearBookSearch">
+    delete from BOOK_SEARCH
+  </delete>
+    <delete id="clearBookSearchWeb">
+        delete from BOOK_SEARCH_WEB
+    </delete>
+    <delete id="deleteBookRentSearch">
+        delete from BOOK_RENT_SEARCH
+    </delete>
+
+    <select id="getBookNames" resultType="java.lang.String">
+    SELECT BRL.BOOK_NAME FROM BOOK_RANKING_LIST BRL
+  </select>
+
+    <select id="getBookScore" resultType="java.lang.Double">
+    SELECT BRL.BOOK_SCORE FROM BOOK_RANKING_LIST BRL
+  </select>
+
+    <select id="getBookNameListFromSearch" resultType="java.lang.String">
+    SELECT BS.BOOK_NAME FROM BOOK_SEARCH BS
+  </select>
+
+    <select id="getLocationNameListFromSearch" resultType="java.lang.String">
+    SELECT BS.LOCATION_NAME FROM BOOK_SEARCH BS
+  </select>
+
+    <select id="getLocationFullNameListFromSearch" resultType="java.lang.String">
+    SELECT BS.LOCATION_FULL_NAME FROM BOOK_SEARCH BS
+  </select>
+
+    <select id="getBooksNumListFromSearch" resultType="java.lang.Integer">
+    SELECT BOOKS_NUM FROM BOOK_SEARCH BS
+  </select>
+    <select id="getBooksProfile" resultType="java.lang.String">
+        SELECT BB.books_profile
+        FROM BOOK_BOOKS BB
+        <where>
+            BB.books_name = #{bookname,jdbcType=VARCHAR}
+            and BB.location_name = #{bookstore,jdbcType=VARCHAR}
+        </where>
+    </select>
+    <select id="getBookNameFromTableWeb" resultType="java.lang.String">
+        SELECT BSW.BOOK_NAME FROM BOOK_SEARCH_WEB BSW
+    </select>
+    <select id="getBookNumFromTableWeb" resultType="java.lang.Integer">
+        SELECT BSW.BOOKS_NUM FROM BOOK_SEARCH_WEB BSW
+    </select>
+    <select id="getBookRentNameByRent" resultType="java.lang.String">
+        SELECT BRS.BOOK_RENT_NAME FROM BOOK_RENT_SEARCH BRS
+    </select>
+    <select id="getLocationNameByRent" resultType="java.lang.String">
+        SELECT BRS.LOCATION_NAME FROM BOOK_RENT_SEARCH BRS
+    </select>
+    <select id="getBooksLocationByRent" resultType="java.lang.String">
+        SELECT BRS.BOOKS_LOCATION FROM BOOK_RENT_SEARCH BRS
+    </select>
+    <select id="getBooksNumByRent" resultType="java.lang.Integer">
+        SELECT BRS.BOOKS_NUM FROM BOOK_RENT_SEARCH BRS
+    </select>
+    <select id="getBookNowNum" resultType="java.lang.Integer">
+        SELECT BB.BOOKS_NUM FROM BOOK_BOOKS BB
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </select>
+    <select id="getBookCoding" resultType="java.lang.Long">
+        SELECT BB.BOOKS_CODING FROM BOOK_BOOKS BB
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </select>
+    <select id="getRentNum" resultType="java.lang.Integer">
+        SELECT BB.BOOKS_RENT_NUM
+        FROM BOOK_BOOKS BB
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </select>
+    <select id="getBookScoreSingle" resultType="java.lang.Double">
+        SELECT BB.BOOKS_SCORE
+        FROM BOOK_BOOKS BB
+        <where>
+            BB.LOCATION_NAME = #{bookStore}
+            AND BB.BOOKS_NAME = #{bookName}
+        </where>
+    </select>
+
+    <insert id="createBookSearchList" parameterType="string" useGeneratedKeys="false">
+        INSERT INTO BOOK_SEARCH ( BOOK_NAME, LOCATION_NAME, LOCATION_FULL_NAME, BOOKS_NUM ) (
+        SELECT * FROM(
+        SELECT
+        BB.BOOKS_NAME,
+        BB.LOCATION_NAME,
+        BL.LOCATION_FULL_NAME,
+        BB.BOOKS_NUM
+        FROM
+        BOOK_BOOKS BB,
+        BOOK_LOCATION BL
+        <where>
+            BB.LOCATION_NAME = BL.LOCATION_NAME
+            AND BB.BOOKS_NAME LIKE concat(concat('%',#{bookNameFromIntent}),'%')
+        </where>
+        )
+        )
+    </insert>
+    <insert id="createBookSearchWebListByTextAndBookStore" useGeneratedKeys="false">
+        INSERT INTO BOOK_SEARCH_WEB(BOOK_NAME,BOOKS_NUM)
+        (SELECT * FROM(
+        SELECT BB.BOOKS_NAME,BB.BOOKS_NUM FROM BOOK_BOOKS BB
+        <where>BB.BOOKS_NAME LIKE concat(concat('%',#{bookNameFromWeb}),'%') AND BB.LOCATION_NAME = #{bookStore}
+        </where>)
+        )
+    </insert>
+    <insert id="createRentBookSearchListByTextAndBookStore" useGeneratedKeys="false">
+        INSERT INTO BOOK_RENT_SEARCH(BOOK_RENT_NAME,LOCATION_NAME,BOOKS_LOCATION,BOOKS_NUM)
+        (SELECT * FROM(
+        SELECT BB.BOOKS_NAME,BB.LOCATION_NAME,BB.BOOKS_LOCATION,BB.BOOKS_NUM FROM BOOK_BOOKS BB
+        <where>BB.BOOKS_NAME LIKE concat(concat('%',#{bookNameText}),'%') AND BB.LOCATION_NAME = #{bookStore}
+        </where>)
+        )
+    </insert>
+</mapper>

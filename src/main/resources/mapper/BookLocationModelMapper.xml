@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookLocationModelMapper">
+  <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookLocationModel">
+    <id column="ID" jdbcType="NUMERIC" property="id" />
+    <result column="LOCATION_NAME" jdbcType="VARCHAR" property="locationName" />
+    <result column="LOCATION_FULL_NAME" jdbcType="VARCHAR" property="locationFullName" />
+  </resultMap>
+
+  <select id="getLocationFull" resultType="java.lang.String">
+    SELECT BL.location_full_name
+    from BOOK_LOCATION BL
+    <where>
+      BL.location_name = #{bookstore,jdbcType=VARCHAR}
+    </where>
+  </select>
+    <select id="getBookStoreExceptNET" resultType="java.lang.String">
+      SELECT BL.LOCATION_NAME
+      FROM BOOK_LOCATION BL
+      <where>
+        BL.LOCATION_NAME <![CDATA[ <> ]]>'NET'
+      </where>
+    </select>
+
+</mapper>

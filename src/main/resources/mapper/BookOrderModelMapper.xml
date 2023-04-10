@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookOrderModelMapper">
+    <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookOrderModel">
+        <id column="ID" jdbcType="DECIMAL" property="id"/>
+        <result column="ACCOUNT" jdbcType="DECIMAL" property="account"/>
+        <result column="ORDER_NUM" jdbcType="DECIMAL" property="orderNum"/>
+        <result column="BOOK_CODING" jdbcType="DECIMAL" property="bookCoding"/>
+        <result column="BOOK_NAME" jdbcType="VARCHAR" property="bookName"/>
+        <result column="RENT_LOCATION_NAME" jdbcType="VARCHAR" property="rentLocationName"/>
+        <result column="TIME_GENERATE" jdbcType="DATE" property="timeGenerate"/>
+        <result column="CURRENT_SCORE" jdbcType="DECIMAL" property="currentScore"/>
+        <result column="RESIDUE_DAY" jdbcType="DECIMAL" property="residueDay"/>
+        <result column="RECEIVER_ADDRESS" jdbcType="VARCHAR" property="receiverAddress"/>
+        <result column="BOOLEAN_TALK" jdbcType="DECIMAL" property="booleanTalk"/>
+    </resultMap>
+
+    <insert id="createBookHistory" useGeneratedKeys="false">
+        INSERT INTO BOOK_HISTORY(ORDER_NUM,BOOK_NAME,RENT_LOCATION_NAME,RESIDUE_DAY) (SELECT * FROM(
+        SELECT BO.ORDER_NUM,BO.BOOK_NAME,BO.RENT_LOCATION_NAME,BO.RESIDUE_DAY FROM BOOK_ORDER BO
+        <where>
+            BO.account = #{userAccount}
+        </where>
+        ))
+    </insert>
+    <insert id="insertNewOrder">
+        <selectKey resultType="int" keyProperty="id" order="BEFORE">
+            SELECT BOOK_ORDER_SEQUENCE.nextval FROM DUAL
+        </selectKey>
+        insert into BOOK_ORDER(
+        id,account,order_num,book_coding,book_name,rent_location_name,time_generate,residue_day,current_score,receiver_address
+        ) values (
+        #{id},#{account},#{orderNum},#{bookCoding},#{bookName},#{rentLocationName},#{timeGenerate,jdbcType=DATE},#{residueDay},#{currentScore},#{receiverAddress}
+        )
+    </insert>
+    <insert id="createBookOrderBookNameList" useGeneratedKeys="false">
+        INSERT INTO BOOK_ORDER_BOOKNAME_LIST BOBL(BOBL.BOOK_NAME,BOBL.BOOLEAN_TALK) (
+        SELECT * FROM (
+        SELECT DISTINCT BO.BOOK_NAME,BO.BOOLEAN_TALK FROM BOOK_ORDER BO WHERE BO.ACCOUNT = #{accountUser}
+        )
+        )
+    </insert>
+    <delete id="clearBookHistory">
+    delete from BOOK_HISTORY
+  </delete>
+    <delete id="clearTableBookOrderBookName">
+        delete from BOOK_ORDER_BOOKNAME_LIST
+    </delete>
+    <select id="getBookName" resultType="java.lang.String">
+        SELECT BO.BOOK_NAME
+        FROM BOOK_ORDER BO
+        <where>
+            BO.order_num = #{currentNum,jdbcType=VARCHAR}
+        </where>
+    </select>
+    <select id="getTimeGenerate" resultType="java.lang.String">
+        SELECT to_char(BO.TIME_GENERATE,'YYYY-MM-DD')
+        FROM BOOK_ORDER BO
+        <where>
+            BO.order_num = #{currentNum,jdbcType=VARCHAR}
+        </where>
+    </select>
+
+    <select id="getResidueDay" resultType="java.lang.Integer">
+        SELECT BO.RESIDUE_DAY
+        FROM BOOK_ORDER BO
+        <where>
+            BO.order_num = #{currentNum,jdbcType=VARCHAR}
+        </where>
+    </select>
+    <select id="getBookStore" resultType="java.lang.String">
+        SELECT BO.RENT_LOCATION_NAME
+        FROM BOOK_ORDER BO
+        <where>
+            BO.order_num = #{currentNum,jdbcType=VARCHAR}
+        </where>
+    </select>
+    <select id="getCurrentOrder" resultType="java.lang.Long">
+    SELECT BH.order_num FROM BOOK_HISTORY BH
+  </select>
+    <select id="getBookNameList" resultType="java.lang.String">
+    SELECT BH.book_name FROM BOOK_HISTORY BH
+  </select>
+    <select id="getBookStoreList" resultType="java.lang.String">
+    SELECT BH.rent_location_name FROM BOOK_HISTORY BH
+  </select>
+    <select id="getDayList" resultType="java.lang.Long">
+    SELECT BH.residue_day FROM BOOK_HISTORY BH
+  </select>
+    <select id="getBookNameFromOrderTable" resultType="java.lang.String">
+      SELECT BO.BOOK_NAME
+      FROM BOOK_ORDER BO
+      <where>
+          BO.ACCOUNT = #{accountUser}
+      </where>
+    </select>
+    <select id="getBookNameInBookOrderNameList" resultType="java.lang.String">
+        SELECT BOBL.BOOK_NAME FROM BOOK_ORDER_BOOKNAME_LIST BOBL
+    </select>
+    <select id="getBooleanTalkInBookOrderNameList" resultType="java.lang.Integer">
+        SELECT BOBL.BOOLEAN_TALK FROM BOOK_ORDER_BOOKNAME_LIST BOBL
+    </select>
+
+    <update id="updateResidueDay">
+        UPDATE BOOK_ORDER BO SET BO.RESIDUE_DAY = 14
+        <where>
+            BO.order_num = #{currentNum,jdbcType=VARCHAR}
+        </where>
+    </update>
+    <update id="uploadBookBooleanTalk">
+        UPDATE BOOK_ORDER BO SET BO.boolean_talk = 1
+        <where>
+            BO.ACCOUNT = #{accountUser}
+            AND BO.BOOK_NAME = #{bookNameOrder}
+        </where>
+    </update>
+
+</mapper>

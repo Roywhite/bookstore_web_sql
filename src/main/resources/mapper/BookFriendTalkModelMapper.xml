@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaobai.mapper.BookFriendTalkModelMapper">
+    <resultMap id="BaseResultMap" type="com.xiaobai.entity.BookFriendTalkModel">
+        <id column="ID" jdbcType="NUMERIC" property="id"/>
+        <id column="ACCOUNT" jdbcType="NUMERIC" property="account"/>
+        <result column="USER_NAME" jdbcType="VARCHAR" property="userName"/>
+        <result column="BOOK_NAME" jdbcType="VARCHAR" property="bookName"/>
+        <result column="TALK" jdbcType="VARCHAR" property="talk"/>
+        <result column="GENERATE_TIME" jdbcType="DATE" property="generateTime"/>
+    </resultMap>
+    <insert id="addNewTalk" parameterType="com.xiaobai.entity.BookFriendTalkModel">
+        <selectKey resultType="int" keyProperty="id" order="BEFORE">
+            SELECT BOOK_FRIEND_TALK_SEQUENCE.nextval FROM DUAL
+        </selectKey>
+        insert into BOOK_FRIEND_TALK(
+        id,ACCOUNT,USER_NAME,BOOK_NAME,TALK,GENERATE_TIME
+        ) values (
+        #{id},#{account},#{userName},#{bookName},#{talk},#{generateTime}
+        )
+    </insert>
+    <delete id="deleteTalk">
+        DELETE FROM BOOK_FRIEND_TALK BFT
+        <where>
+            BFT.ACCOUNT = #{account}
+            AND BFT.BOOK_NAME = #{bookName}
+            AND BFT.TALK = #{talk}
+        </where>
+    </delete>
+    <select id="getTalk" resultMap="BaseResultMap">
+        SELECT BFT.ID,BFT.ACCOUNT,BFT.USER_NAME,BFT.BOOK_NAME,BFT.TALK
+        FROM BOOK_FRIEND_TALK BFT
+        <where>
+                BFT.BOOK_NAME IN
+                <foreach collection="bookNameFromOrderTable" item="item" index="index"  open="(" separator="," close=")" >
+                    #{item}
+                </foreach>
+        </where>
+        order by BFT.GENERATE_TIME desc
+    </select>
+
+</mapper>
